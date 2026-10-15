@@ -137,6 +137,13 @@ const server = http.createServer((req, res) => {
       return;
     }
 
+    if (path === "/uptime") {
+      writeJson(res, 200, {
+        uptimeSeconds: Math.round(process.uptime())
+      });
+      return;
+    }
+
     statusCode = 404;
     writeJson(res, statusCode, { error: "Not found" });
   } catch (error) {
