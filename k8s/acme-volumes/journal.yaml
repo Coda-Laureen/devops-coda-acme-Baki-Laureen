@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: journal
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: journal
+  template:
+    metadata:
+      labels:
+        app: journal
+    spec:
+      terminationGracePeriodSeconds: 2    # busybox ignore SIGTERM : on coupe vite
+      containers:
+        - name: ecrivain
+          image: busybox:1.36
+          command: ["sh", "-c"]
+          args:
+            - while true; do echo "$(date +%T) $(hostname)" >> /data/journal.txt; sleep 5; done
+          volumeMounts:
+            - name: donnees
+              mountPath: /data
+        - name: web
+          image: nginx:1.27-alpine
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: donnees
+              mountPath: /usr/share/nginx/html
+      volumes:
+        - name: donnees
+          persistentVolumeClaim:
+            claimName: journal-data
