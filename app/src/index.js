@@ -128,7 +128,10 @@ const server = http.createServer((req, res) => {
      }
 
     if (path === "/health") {
-      writeJson(res, 200, { status: "ready" });
+      writeJson(res, 200, {
+        status: "healthy",
+        uptimeSeconds: Math.round(process.uptime())
+      });
       return;
     }
 
